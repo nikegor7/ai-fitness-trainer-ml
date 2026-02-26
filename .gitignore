@@ -1,0 +1,56 @@
+# Python virtual environment
+venv/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data files (large / generated)
+data/raw/
+data/processed/
+data/real/
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.pkl
+*.pickle
+
+# Trained models (large binaries — export TFLite only)
+models/saved/
+models/checkpoints/
+*.keras
+*.pb
+logs/
+
+# TFLite outputs go to assets/models/ in the Flutter project, not here
+*.tflite
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# TXT files
+PROGRESS.TXT
+ROADMAP.md
