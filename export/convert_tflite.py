@@ -52,8 +52,14 @@ def convert_one(
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
 
     # float16 quantisation — ~2× size reduction with negligible accuracy loss
-    converter.optimizations          = [tf.lite.Optimize.DEFAULT]
+    # SELECT_TF_OPS required for BiLSTM (TensorListReserve not in builtin ops)
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
     converter.target_spec.supported_types = [tf.float16]
+    converter.target_spec.supported_ops = [
+        tf.lite.OpsSet.TFLITE_BUILTINS,
+        tf.lite.OpsSet.SELECT_TF_OPS,
+    ]
+    converter._experimental_lower_tensor_list_ops = False
 
     tflite_bytes = converter.convert()
 

@@ -70,7 +70,7 @@ def evaluate_exercise(
     exercise: str,
     model: tf.keras.Model,
     verbose: bool = True,
-) -> dict[str, dict[str, float]]:
+) -> dict:
     """
     Evaluate model on the test split for one exercise.
 

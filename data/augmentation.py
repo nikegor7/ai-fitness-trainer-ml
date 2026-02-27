@@ -154,7 +154,7 @@ def augment_batch(
     sequences: np.ndarray,
     scores: np.ndarray,
     factor: int = 2,
-    seed: int | None = None,
+    seed=None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Augment a full dataset, returning original + augmented copies.

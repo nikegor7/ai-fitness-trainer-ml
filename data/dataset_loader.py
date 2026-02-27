@@ -86,7 +86,7 @@ def load_synthetic(exercise: str) -> tuple[np.ndarray, np.ndarray]:
     return sequences, scores
 
 
-def load_real(exercise: str) -> tuple[np.ndarray | None, np.ndarray | None]:
+def load_real(exercise: str) -> tuple:
     """
     Load real expert-annotated sequences and scores for one exercise.
 
