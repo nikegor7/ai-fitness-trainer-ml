@@ -23,6 +23,7 @@ import tensorflow as tf
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from config import EXERCISES, N_FRAMES, N_FEATURES
 from data.dataset_loader import get_splits
+from models.form_scorer_model import build_form_scorer
 
 MODELS_DIR  = Path(__file__).parent.parent / 'models' / 'saved'
 DEFAULT_OUT = Path(__file__).parent / 'tflite'
@@ -48,18 +49,22 @@ def convert_one(
     """
     print(f'\n  Converting {exercise}  ←  {model_path.name}')
 
-    model     = tf.keras.models.load_model(str(model_path))
+    # Rebuild architecture from code so `unroll=True` (from form_scorer_model.py)
+    # takes effect, then transfer the trained weights. Loading the saved .keras
+    # directly would restore the original rolled LSTM graph and bring back the
+    # TensorList ops that break pure-builtin TFLite conversion.
+    model = build_form_scorer()
+    model.load_weights(str(model_path))
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
 
-    # float16 quantisation — ~2× size reduction with negligible accuracy loss
-    # SELECT_TF_OPS required for BiLSTM (TensorListReserve not in builtin ops)
+    # float16 quantisation — ~2× size reduction with negligible accuracy loss.
+    # TFLITE_BUILTINS only: tflite_flutter does not ship the Flex delegate, so
+    # the BiLSTM must fuse to the built-in UnidirectionalSequenceLSTM op and
+    # any TensorList ops must be lowered to static ops.
     converter.optimizations = [tf.lite.Optimize.DEFAULT]
     converter.target_spec.supported_types = [tf.float16]
-    converter.target_spec.supported_ops = [
-        tf.lite.OpsSet.TFLITE_BUILTINS,
-        tf.lite.OpsSet.SELECT_TF_OPS,
-    ]
-    converter._experimental_lower_tensor_list_ops = False
+    converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS]
+    converter._experimental_lower_tensor_list_ops = True
 
     tflite_bytes = converter.convert()
 

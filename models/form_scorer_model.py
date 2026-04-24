@@ -53,10 +53,13 @@ def build_form_scorer(
     x = layers.Dropout(0.3, name='drop1')(x)
 
     # ── Sequence modelling ────────────────────────────────────────────────
+    # unroll=True eliminates TensorList ops so the model converts to TFLite
+    # built-in ops only (no Flex delegate needed at runtime). Only valid
+    # because the post-pool timestep count (45) is static.
     x = layers.Bidirectional(
-        layers.LSTM(64, return_sequences=True), name='bilstm1')(x)
+        layers.LSTM(64, return_sequences=True, unroll=True), name='bilstm1')(x)
     x = layers.Bidirectional(
-        layers.LSTM(64, return_sequences=False), name='bilstm2')(x)
+        layers.LSTM(64, return_sequences=False, unroll=True), name='bilstm2')(x)
 
     # ── Classifier head ───────────────────────────────────────────────────
     x   = layers.Dense(128, activation='relu', name='dense1')(x)
